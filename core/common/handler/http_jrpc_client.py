@@ -38,7 +38,7 @@ class HttpJrpcClient(object):
         self.ServiceURL = url
         self.ProxyHandler = urllib.request.ProxyHandler({})
 
-    def _postmsg(self, request, retries=0):
+    def _postmsg(self, request, retries=0)_postmsg(self, request, retries=0):
         """
         Post a request JSON RPC string and return the response.
 
@@ -51,6 +51,9 @@ class HttpJrpcClient(object):
         datalen = len(data)
 
         url = self.ServiceURL
+
+        logger.debug('post request to %s with DATALEN=%d, DATA=<%s>',
+                     url, datalen, data)
 
         try:
             request = urllib.request.Request(

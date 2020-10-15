@@ -23,12 +23,14 @@
 # logging.basicConfig(
 #     format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
+import json
+import time
 from core.enums.work_order_status import WorkOrderStatus
 from core.handler.http_jrpc_client import HttpJrpcClient
 from core.interfaces.work_order import WorkOrder
-from core.exceptions.invalid_parameter_format_or_vaue import InvalidParameterFormatOrValueException
+from core.exceptions.invalid_parameter_format_or_value import InvalidParameterFormatOrValueException
 from core.validation.argument_validator import ArgumentValidator
-from core.validation.json_va;idator import JsonValidator
+from core.validation.json_validator import JsonValidator
 
 
 class JRPCWorkOrderImpl(WorkOrder):
@@ -53,29 +55,30 @@ class JRPCWorkOrderImpl(WorkOrder):
         """
         
         # JSON Validation
+        print(work_order_request)
+        print(type(work_order_request))
         json_validation_exception = \
                 JsonValidator.schema_validation(
                     "WorkOrderSubmit",
-                    json.loads(work_order_request),
+                    work_order_request,
                     id)
         if json_validation_exception:
-            return argument_validation_exception
-
+            return json_validation_exception
+        print("completed json validation")
         # Argument validation
         argument_validation_exception = ArgumentValidator.not_null(id, worker_id, work_order_id, requester_id, work_order_request)
         if argument_validation_exception:
             return argument_validation_exception
-        
+        print("completed argument validation")
         json_rpc_request = {
             "jsonrpc": "2.0",
             "method": "WorkOrderSubmit",
             "id": id
         }
-        json_rpc_request["params"] = json.loads(work_order_request)
-
-        logging.debug("Work order request %s", json.dumps(json_rpc_request))
-        response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
-        return response
+        json_rpc_request["params"] = work_order_request
+        return json_rpc_request
+        # response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
+        # return response
 
     def work_order_get_result_nonblocking(self, work_order_id, id=None):
         """
@@ -88,6 +91,7 @@ class JRPCWorkOrderImpl(WorkOrder):
         Returns:
         JSON RPC response of dictionary type
         """
+        
         json_rpc_request = {
             "jsonrpc": "2.0",
             "method": "WorkOrderGetResult",
@@ -111,6 +115,10 @@ class JRPCWorkOrderImpl(WorkOrder):
         Returns:
         JSON RPC response of dictionary type
         """
+        argument_validation_exception = ArgumentValidator.not_null(id, work_order_id)
+        if argument_validation_exception:
+            return argument_validation_exception
+        print("completed argument validation")
         response = self.work_order_get_result_nonblocking(work_order_id, id)
         if "error" in response:
             if response["error"]["code"] != WorkOrderStatus.PENDING:
@@ -155,6 +163,10 @@ class JRPCWorkOrderImpl(WorkOrder):
                             last_used_key_nonce, tag, and signature_nonce.
         id                  Optional JSON RPC request ID
         """
+        argument_validation_exception = ArgumentValidator.not_null(id, worker_id, requester_id)
+        if argument_validation_exception:
+            return argument_validation_exception
+        
         json_rpc_request = {
             "jsonrpc": "2.0",
             "method": "EncryptionKeyGet",

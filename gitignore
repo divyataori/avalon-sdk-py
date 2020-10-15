@@ -1,0 +1,14 @@
+# Packages #
+############
+*.gz
+*.iso
+*.jar
+*.tar
+*.zip
+*.egg-info
+
+/dev
+/dist
+/build
+core/sdk/dist
+core/sdk/build

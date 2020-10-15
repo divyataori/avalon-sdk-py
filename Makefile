@@ -1,4 +1,4 @@
-# Copyright 2019 Intel Corporation
+# Copyright 2020 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+WHEEL_FILE=dist/avalon_sdk-linux_x86_64.whl
 
-__all__ = [ ]
+all :
+	python3 setup.py sdist bdist_wheel
+
+clean:
+	if [ -f $(WHEEL_FILE) ] ; then pip3 uninstall --yes $(WHEEL_FILE); fi
+	rm -rf build deps dist *.egg-info
+	find . -iname '*.pyc' -delete
+	find . -iname '__pycache__' -delete
+
+.PHONY : all
+.PHONY : clean
+.PHONY : install
+
 

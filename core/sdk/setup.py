@@ -1,4 +1,6 @@
-# Copyright 2020 Intel Corporation
+#!/usr/bin/env python
+
+# Copyright 2019 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,20 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Decorator  function
-"""
+import os
+import sys
+import subprocess
 
-import functools
-from avalon_sdks.Exception.InvalidException import InvalidParamException
+from setuptools import setup, find_packages
 
-def decorate(f):
-    @functools.wraps(f)
-    def func(*args, **kwargs):
-        try:
-            return f(*args, **kwargs)
-        except InvalidParamException as e:
-            return e.error_message()
-        except Exception as e:
-            print('Caught an exception in', f.__name__)
-    return func
+
+setup(name='avalon_sdk_direct',
+      version='0.0.4',
+      description='Avalon SDK Direct',
+      author='Hyperledger Avalon Direct',
+      author_email="karthika.murthy@intel.com",
+      url='https://github.com/hyperledger/avalon_sdk_py/direct',
+      packages=find_packages(),
+      install_requires=[],
+      entry_points={})
+

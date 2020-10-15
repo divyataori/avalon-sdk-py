@@ -15,7 +15,7 @@
 import json
 import logging
 
-import validation.schema_validation.validate as WOcheck
+from core.validation.json_validator import JsonValidator as WOcheck
 # import avalon_crypto_utils.crypto_utility as crypto_utility
 # import avalon_crypto_utils.signature as signature
 from enums.work_order_status import WorkOrderStatus

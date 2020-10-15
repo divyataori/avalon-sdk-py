@@ -12,23 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.enums.work_order_status import WorkOrderStatus
-from core.exceptions.generic_error import GenericError
+from core.enums.error_code import WorkerError
 
-class InvalidParameterFormatOrValueException(Exception,GenericError):
+class InvalidParamException(Exception):
     """All errors and status are returned in 
     the following generic JSON RPC error format"""
 
-    def __init__(self, id, message, data):
+    def __init__(self, message, id):
 
         self.error = {
-            "jsonrpc": "2.0",
-            "id": id,
-            "error": {       
-                "code": WorkOrderStatus.INVALID_PARAMETER_FORMAT_OR_VALUE,
+            "jsonrpc": "2.0",       # as per JSON RPC spec
+            "id": id,               # the same as in input
+            "error": {              # as per JSON RPC spec
+                "code": WorkerError.INVALID_PARAMETER_FORMAT_OR_VALUE,
                 "message": message,
-                # Implementation specific data
-                "data": data
+                "data": "unknown error"
             }   
         }
 

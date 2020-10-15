@@ -34,6 +34,10 @@ class WorkOrderStatus(IntEnum):
     BUSY = 8
     INVALID_WORKLOAD = 9
     UNKNOWN_ERROR = 10
+    
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_ 
 
 
 @unique
@@ -45,6 +49,10 @@ class WorkerError(IntEnum):
     INVALID_SIGNATURE = 4
     NO_MORE_LOOKUP_RESULTS = 5
     UNSUPPORTED_MODE = 6
+    
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_ 
 
 
 @unique
@@ -54,6 +62,10 @@ class ReceiptCreateStatus(IntEnum):
     PROCESSED = 2
     FAILED = 3
     REJECTED = 4
+    
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_ 
 
 
 @unique
@@ -64,12 +76,20 @@ class SignatureStatus(IntEnum):
     INVALID_SIGNATURE_FORMAT = -1
     ERROR_RESPONSE = -2
     INVALID_VERIFICATION_KEY = -3
+    
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_ 
 
 
 @unique
 class QuoteStatus(IntEnum):
     GROUP_OUT_OF_DATE_OK = 1
     GROUP_OUT_OF_DATE_NOT_OK = 2
+    
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_ 
 
 
 # Generic jrpc error codes
@@ -82,12 +102,20 @@ class JRPCErrorCodes(IntEnum):
     INVALID_SIGNATURE = 4
     NO_MORE_LOOKUP_RESULTS = 5
     UNSUPPORTED_MODE = 6
+    
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_ 
 
 
 @unique
 class WPERegisterStatus(IntEnum):
     SUCCESS = 0
     FAILURE = 1
+    
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_ 
 
 
 @unique

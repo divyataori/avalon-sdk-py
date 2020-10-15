@@ -29,43 +29,44 @@ class JsonValidator(object):
         self.params = params
         self.method = method
 
+
     @decorate 
     def schema_validation(method, params, id):
-    """
-    Validate params dictionary for existence of
-    fields and mandatory fields
+        """
+        Validate params dictionary for existence of
+        fields and mandatory fields
 
-    Parameters:
-    params    Parameter dictionary to validate
-    method    Method Name
+        Parameters:
+        params    Parameter dictionary to validate
+        method    Method Name
 
-    Returns:
-    None      Schema validation is successful
-    Invalid parameter format or value Exception     Schema validation fails
-    
-    """
-    if len(params) == 0:
-        message = "Invalid parameter format or value"
-        data = "Empty dictionary object received" +params
-        raise InvalidParameterFormatOrValueException(id, message, data)
+        Returns:
+        None      Schema validation is successful
+        Invalid parameter format or value Exception Schema validation fails
+        """
+        if len(params) == 0:
+            message = "Invalid parameter format or value"
+            data = "Empty dictionary object received" +params
+            raise InvalidParameterFormatOrValueException(id, message, data)
 
-    schema = {}
-    file_name = "data/" + method + ".json"
+        schema = {}
+        file_name = "data/" + method + ".json"
 
-    data_file = pkg_resources.resource_string(__name__, file_name)
-    schema = json.loads(data_file)
-    try:
-        validate(params, schema)
-    except ValidationError as e:
-        message = "Invalid parameter format or value"
-        if e.validator == 'additionalProperties' or \
-                e.validator == 'required':
-            raise InvalidParameterFormatOrValueException(id, message, e.message)
-        else:
-            return InvalidParameterFormatOrValueException(id, message, e.schema["error_msg"])
-    except SchemaError as err:
-        return InvalidParameterFormatOrValueException(id, message, err.message)
-    except Exception as err:
-        return InvalidParameterFormatOrValueException(id, message, str(err))
+        data_file = pkg_resources.resource_string(__name__, file_name)
+        schema = json.loads(data_file)
+        try:
+            validate(params, schema)
+        except ValidationError as e:
+            message = "Invalid parameter format or value"
+            if e.validator == 'additionalProperties' or \
+                    e.validator == 'required':
+                raise InvalidParameterFormatOrValueException(id, message, e.message)
+            else:
+                return InvalidParameterFormatOrValueException(id, message, e.schema["error_msg"])
+        except SchemaError as err:
+            return InvalidParameterFormatOrValueException(id, message, err.message)
+        except Exception as err:
+            return InvalidParameterFormatOrValueException(id, message, str(err))
 
-    return None
+        return None
+

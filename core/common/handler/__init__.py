@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright 2019 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,24 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-import subprocess
 
-from setuptools import setup, find_packages
-
-
-if os.sys.version_info[0] < 3:
-    print('ERROR: must run with python3')
-    sys.exit(1)
-
-
-setup(name='avalon_sdk_py',
-      version='0.0.4',
-      description='Python SDK for Avalon',
-      author='Hyperledger Avalon',
-      url='https://github.com/hyperledger/avalon_sdk_py',
-      packages=find_packages(),
-      install_requires=[],
-      entry_points={
-      })
+__all__ = [ ]

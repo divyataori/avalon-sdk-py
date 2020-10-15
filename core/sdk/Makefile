@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-# Copyright 2019 Intel Corporation
+# Copyright 2020 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,24 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-import subprocess
+WHEEL_FILE=dist/avalon_sdk_direct-linux_x86_64.whl
 
-from setuptools import setup, find_packages
+all :
+	python3 setup.py sdist bdist_wheel
+    
+clean:
+	if [ -f $(WHEEL_FILE) ] ; then pip3 uninstall --yes $(WHEEL_FILE); fi
+	rm -rf build deps dist *.egg-info
+	find . -iname '*.pyc' -delete
+	find . -iname '__pycache__' -delete
 
-
-if os.sys.version_info[0] < 3:
-    print('ERROR: must run with python3')
-    sys.exit(1)
-
-
-setup(name='avalon_sdk_py',
-      version='0.0.4',
-      description='Python SDK for Avalon',
-      author='Hyperledger Avalon',
-      url='https://github.com/hyperledger/avalon_sdk_py',
-      packages=find_packages(),
-      install_requires=[],
-      entry_points={
-      })
+.PHONY : all
+.PHONY : clean
+.PHONY : install

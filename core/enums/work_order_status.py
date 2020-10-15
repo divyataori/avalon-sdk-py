@@ -38,3 +38,12 @@ class WorkOrderStatus(IntEnum):
     @classmethod
     def has_value(cls, value):
         return value in cls._value2member_map_
+
+# As per section 6.1.9 of EEA Spec
+class WorkOrderStatusNew(IntEnum):
+    GENERIC_ERRROR = 1
+    OPERATION_NOT_SUPPORTED = 2
+    INVALID_PARAMETER = 3
+    ACCESS_DENIED = 4
+    PENDING = 5
+

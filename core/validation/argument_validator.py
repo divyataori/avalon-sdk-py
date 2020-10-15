@@ -15,10 +15,9 @@
 """
 Argument Validation
 """ 
-import avalon_sdks
-from avalon_sdks.EncodingConventions.WorkerStateCode import WorkerType
-from avalon_sdks.Exception.InvalidException import InvalidParamException
-from avalon_sdks.Handler.Decorator import decorate  
+from core.enums.worker import WorkerType
+from core.exceptions.invalid_parameter import InvalidParamException
+from core.handler.decorator import decorate
 
 
 class ArgumentValidator(object):
@@ -47,8 +46,8 @@ class ArgumentValidator(object):
     def not_null(self,id, *argv): 
         for arg in argv: 
             if arg is None:
-            message = "Empty params in the request" 
-            raise InvalidParamException(message, id)
+                message = "Empty params in the request" 
+                raise InvalidParamException(message, id)
         
         return None
         
@@ -60,4 +59,8 @@ class ArgumentValidator(object):
         if not os.path.isfile(filepath):
             message = "Invalid Filepath" 
             raise InvalidParamException(message, id)
-        
+    
+    def checkHexLength(self, id, hex_value, length):
+        if length != len("{:x}".format(hex_value)):
+            message = "Invalid size of hex string: "+ hex_value
+            raise InvalidParamException(message, id)

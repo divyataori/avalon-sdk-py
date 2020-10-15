@@ -17,7 +17,7 @@ Decorator  function
 """
 
 import functools
-from avalon_sdks.Exception.InvalidException import InvalidParamException
+from core.exceptions.invalid_parameter import InvalidParamException
 
 def decorate(f):
     @functools.wraps(f)
