@@ -12,22 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from avalon_sdk_py.enums.error_code import WorkerError
-from avalon_sdk_py.exception.generic_error import GenericError
+from core.enums.error_code import JRPCErrorCodes
 
-class InvalidParamException(Exception,GenericError):
+class InvalidParameterFormatOrValueException(Exception):
     """All errors and status are returned in 
     the following generic JSON RPC error format"""
 
-    def __init__(self, message):
+    def __init__(self, message, id):
 
         self.error = {
             "jsonrpc": "2.0",       # as per JSON RPC spec
-            "id": 0,                # the same as in input
+            "id": id,               # the same as in input
             "error": {              # as per JSON RPC spec
-                "code": WorkerError.INVALID_PARAMETER_FORMAT_OR_VALUE,
+                "code": JRPCErrorCodes.INVALID_PARAMETER_FORMAT_OR_VALUE,
                 "message": message,
-                "data": "unknown error"
+                "data": ""
             }   
         }
 

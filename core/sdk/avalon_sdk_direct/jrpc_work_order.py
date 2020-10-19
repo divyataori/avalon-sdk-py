@@ -12,35 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# import json
-# import time
-# import logging
-# from utility.hex_utils import is_valid_hex_str
-# from http_client.http_jrpc_client import HttpJrpcClient
-# from avalon_sdk.connector.interfaces.work_order import WorkOrder
-# from error_code.error_status import WorkOrderStatus, JRPCErrorCodes
 
-# logging.basicConfig(
-#     format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
+
+import logging
 import json
 import time
 from core.enums.work_order_status import WorkOrderStatus
 from core.handler.http_jrpc_client import HttpJrpcClient
 from core.interfaces.work_order import WorkOrder
-from core.exceptions.invalid_parameter_format_or_value import InvalidParameterFormatOrValueException
+from core.exceptions.invalid_parameter_jrpc import InvalidParameterFormatOrValueException
 from core.validation.argument_validator import ArgumentValidator
-from core.validation.json_validator import JsonValidator
+from core.validation.json_validator import json_validation
+from core.enums.error_code import JRPCErrorCodes
+from core.handler.decorator import decorate
+
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 
 class JRPCWorkOrderImpl(WorkOrder):
     """
-    This class is for to manage to the work orders from client side.
+    This class is to manage to the work orders from client side.
     """
 
     def __init__(self, config):
         self.__uri_client = HttpJrpcClient(config["tcf"]["json_rpc_uri"])
+        self.validation = ArgumentValidator()
 
+    @decorate
     def work_order_submit(self, work_order_id, worker_id,
                           requester_id, work_order_request, id=None):
         """
@@ -55,31 +55,23 @@ class JRPCWorkOrderImpl(WorkOrder):
         """
         
         # JSON Validation
-        print(work_order_request)
-        print(type(work_order_request))
-        json_validation_exception = \
-                JsonValidator.schema_validation(
-                    "WorkOrderSubmit",
-                    work_order_request,
-                    id)
-        if json_validation_exception:
-            return json_validation_exception
-        print("completed json validation")
+        json_validation(id, "WorkOrderSubmit", json.loads(work_order_request))
+
         # Argument validation
-        argument_validation_exception = ArgumentValidator.not_null(id, worker_id, work_order_id, requester_id, work_order_request)
-        if argument_validation_exception:
-            return argument_validation_exception
-        print("completed argument validation")
+        self.validation.not_null(id, worker_id, work_order_id, requester_id, json.loads(work_order_request))
+
         json_rpc_request = {
             "jsonrpc": "2.0",
             "method": "WorkOrderSubmit",
             "id": id
         }
-        json_rpc_request["params"] = work_order_request
-        return json_rpc_request
-        # response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
-        # return response
+        json_rpc_request["params"] = json.loads(work_order_request)
 
+        logging.info("Work order request %s", json_rpc_request)
+        response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
+        return response
+
+    @decorate
     def work_order_get_result_nonblocking(self, work_order_id, id=None):
         """
         Get the work order result in non-blocking way.
@@ -103,6 +95,7 @@ class JRPCWorkOrderImpl(WorkOrder):
         response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
         return response
 
+    @decorate
     def work_order_get_result(self, work_order_id, id=None):
         """
         Get the work order result in a blocking way until it gets a
@@ -115,10 +108,8 @@ class JRPCWorkOrderImpl(WorkOrder):
         Returns:
         JSON RPC response of dictionary type
         """
-        argument_validation_exception = ArgumentValidator.not_null(id, work_order_id)
-        if argument_validation_exception:
-            return argument_validation_exception
-        print("completed argument validation")
+        self.validation.not_null(id, work_order_id)
+
         response = self.work_order_get_result_nonblocking(work_order_id, id)
         if "error" in response:
             if response["error"]["code"] != WorkOrderStatus.PENDING:
@@ -137,6 +128,7 @@ class JRPCWorkOrderImpl(WorkOrder):
         else:
             return response
 
+    @decorate
     def encryption_key_get(self, worker_id, requester_id,
                            last_used_key_nonce=None, tag=None,
                            signature_nonce=None, signature=None, id=None):
@@ -163,9 +155,7 @@ class JRPCWorkOrderImpl(WorkOrder):
                             last_used_key_nonce, tag, and signature_nonce.
         id                  Optional JSON RPC request ID
         """
-        argument_validation_exception = ArgumentValidator.not_null(id, worker_id, requester_id)
-        if argument_validation_exception:
-            return argument_validation_exception
+        self.validation.not_null(id, worker_id, requester_id)
         
         json_rpc_request = {
             "jsonrpc": "2.0",
@@ -183,6 +173,7 @@ class JRPCWorkOrderImpl(WorkOrder):
         response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
         return response
 
+    @decorate
     def encryption_key_set(self, worker_id, encryption_key, encryption_nonce,
                            tag, signature_nonce, signature, id=None):
         """
@@ -203,12 +194,7 @@ class JRPCWorkOrderImpl(WorkOrder):
         JRPC response with the result of the operation.
         """
         # Not supported for direct model.
-        return {
-            "jsonrpc": "2.0",
-            "method": "EncryptionKeySet",
-            "id": id,
-            "result": {
-                "code": JRPCErrorCodes.INVALID_PARAMETER_FORMAT_OR_VALUE,
-                "message": "Unsupported method"
-            }
-        }
+        message = "Operation is not supported"
+        raise InvalidParameterFormatOrValueException(message, id)
+
+

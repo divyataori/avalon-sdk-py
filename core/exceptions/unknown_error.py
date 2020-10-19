@@ -12,28 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Generic error  function
-"""
+from core.enums.error_code import WorkerError
 
-class GenericError():
+class UnknownException(Exception):
     """All errors and status are returned in 
     the following generic JSON RPC error format"""
-    
-    def __init__(self):
-    
+
+    def __init__(self, message, data):
+
         self.error = {
-            "jsonrpc": "2.0",    # as per JSON RPC spec
-            "id": 0,     # the same as in input
-            "error": {           # as per JSON RPC spec
-                "code": 1,
-                "message": "unknown error",
-                "data": " unknown error"
+            "jsonrpc": "2.0",
+            "id": 0,
+            "error": {
+                "code": WorkerError.UNKNOWN_ERROR,
+                "message": message,
+                "data": data
             }   
         }
-    
-    def __repr__(self):
-        return "% s" % (self.error)
-    
-    def error_message(self):
-        return self.error

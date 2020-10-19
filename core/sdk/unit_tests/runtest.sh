@@ -29,6 +29,7 @@ make
 pip install dist/avalon_sdk_direct-0.0.4-py3-none-any.whl
 
 cd unit_tests
+python test_work_order_encryption_key_jrpc_impl.py
 python test_work_order_jrpc_impl.py
 #python test_worker_registry_jrpc_impl.py
 

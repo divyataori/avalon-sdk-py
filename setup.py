@@ -32,6 +32,9 @@ setup(name='avalon_sdk_py',
       author='Hyperledger Avalon',
       url='https://github.com/hyperledger/avalon_sdk_py',
       packages=find_packages(),
+      package_data={'': ['data/*.json']},
+      include_package_data=True,
       install_requires=[],
       entry_points={
       })
+

@@ -28,6 +28,10 @@ class WorkOrderStatus(IntEnum):
     INVALID_PARAMETER_FORMAT_OR_VALUE = 2
     ACCESS_DENIED = 3
     INVALID_SIGNATURE = 4
+    # As per EEA Spec 
+    # 5 - pending
+    # 6 - processing
+    # 7 - resereved
     PENDING = 5
     SCHEDULED = 6
     PROCESSING = 7

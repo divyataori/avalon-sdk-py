@@ -31,7 +31,6 @@ class ArgumentValidator(object):
             "WorkerType" : WorkerType
         }
 
-    @decorate
     def enum_value(self,id, enum, value):
 
         enum_obj = self.enum_dic[enum]
@@ -42,7 +41,6 @@ class ArgumentValidator(object):
         
         return None
 
-    @decorate
     def not_null(self,id, *argv): 
         for arg in argv: 
             if arg is None:
@@ -51,7 +49,6 @@ class ArgumentValidator(object):
         
         return None
         
-    @decorate
     def check_path(self, id, path):
         if not isinstance(path, str):
             message = "Directory Path should be string" 

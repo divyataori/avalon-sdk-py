@@ -16,57 +16,40 @@
 import json
 import pkg_resources
 from jsonschema import validate, ValidationError, SchemaError
-from core.handler.decorator import decorate
-from core.exceptions.invalid_parameter_format_or_value import InvalidParameterFormatOrValueException
+from core.exceptions.invalid_parameter import InvalidParamException
 
 
-class JsonValidator(object):
+def json_validation(id, method, params):
     """
-    Helper class for validating the json inputs
+    Validate params dictionary for existence of
+    fields and mandatory fields
+
+    Parameters:
+    params    Parameter dictionary to validate
+
+    Returns:
+    True and empty string on success and
+    False and string with error message on failure.
     """
-
-    def __init__(self,method,params):
-        self.params = params
-        self.method = method
-
-
-    @decorate 
-    def schema_validation(method, params, id):
-        """
-        Validate params dictionary for existence of
-        fields and mandatory fields
-
-        Parameters:
-        params    Parameter dictionary to validate
-        method    Method Name
-
-        Returns:
-        None      Schema validation is successful
-        Invalid parameter format or value Exception Schema validation fails
-        """
-        if len(params) == 0:
-            message = "Invalid parameter format or value"
-            data = "Empty dictionary object received" +params
-            raise InvalidParameterFormatOrValueException(id, message, data)
-
+    if len(params) == 0:
+        message = "Empty Parameters"
+        raise InvalidParamException(message, id)
+    
+    try:
         schema = {}
         file_name = "data/" + method + ".json"
 
         data_file = pkg_resources.resource_string(__name__, file_name)
         schema = json.loads(data_file)
-        try:
-            validate(params, schema)
-        except ValidationError as e:
-            message = "Invalid parameter format or value"
-            if e.validator == 'additionalProperties' or \
-                    e.validator == 'required':
-                raise InvalidParameterFormatOrValueException(id, message, e.message)
-            else:
-                return InvalidParameterFormatOrValueException(id, message, e.schema["error_msg"])
-        except SchemaError as err:
-            return InvalidParameterFormatOrValueException(id, message, err.message)
-        except Exception as err:
-            return InvalidParameterFormatOrValueException(id, message, str(err))
-
-        return None
-
+    
+        validate(params, schema)
+    except ValidationError as e:
+        if e.validator == 'additionalProperties' or \
+                e.validator == 'required':
+            raise InvalidParamException(e.message, id)
+        else:
+            raise InvalidParamException(e.schema["error_msg"], id)
+    except SchemaError as err:
+        raise InvalidParamException(err.message, id)
+    except FileNotFoundError as err:
+        raise InvalidParamException("method not supported", id)

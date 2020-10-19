@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from avalon_sdk-py.core.encoding_conventions.error_status import JRPCErrorCodes
-from avalon_sdks-py.core.exceptions.GenericError import GenericError
+from core.enums.error_code import JRPCErrorCodes
 
-class UnsupportedModeException(Exception,GenericError):
+class UnsupportedModeException(Exception):
     """All errors and status are returned in 
     the following generic JSON RPC error format"""
 
@@ -25,7 +24,7 @@ class UnsupportedModeException(Exception,GenericError):
             "jsonrpc": "2.0",       # as per JSON RPC spec
             "id": 0,                # the same as in input
             "error": {              # as per JSON RPC spec
-                "code": JRPCErrorCodes.UNSUPPORTED_MODE,
+                "code": JRPCErrorCodes.INVALID_PARAMETER_FORMAT_OR_VALUE,
                 "message": message,
                 "data": "unknown error"
             }   

@@ -26,7 +26,7 @@ class InvalidParamException(Exception):
             "error": {              # as per JSON RPC spec
                 "code": WorkerError.INVALID_PARAMETER_FORMAT_OR_VALUE,
                 "message": message,
-                "data": "unknown error"
+                "data": ""
             }   
         }
 

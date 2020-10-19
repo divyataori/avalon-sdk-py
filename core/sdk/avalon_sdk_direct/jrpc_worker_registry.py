@@ -12,25 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# import json
-# import logging
-
-# from error_code.error_status import WorkOrderStatus, JRPCErrorCodes
-# from avalon_sdk.worker.worker_details import WorkerType
-# from utility.hex_utils import is_valid_hex_str
-# from utility.jrpc_utility import create_error_response
-# from http_client.http_jrpc_client import HttpJrpcClient
-# from avalon_sdk.connector.interfaces.worker_registry \
-    # import WorkerRegistry
-
-# logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s",
-                    # level=logging.INFO)
+import json
 
 from core.enums.worker import WorkerType
+from core.validation.argument_validator import ArgumentValidator
+from core.validation.json_validator import json_validation
 from core.interfaces.worker_registry \
      import WorkerRegistry
 from core.handler.http_jrpc_client import HttpJrpcClient
-
+from core.handler.decorator import decorate
 
 class JRPCWorkerRegistryImpl(WorkerRegistry):
     """
@@ -39,35 +29,10 @@ class JRPCWorkerRegistryImpl(WorkerRegistry):
     """
 
     def __init__(self, config):
-        self.__uri_client = HttpJrpcClient(config["tcf"]["json_rpc_uri"])
-
-    # def workerType_validation(self, worker_type, json_rpc_request):
-        # """
-        # Validate the worker type recived in worker related request
-
-        # Parameters:
-        # worker_type Worker type value derived from the worker's DID
-        # json_rpc_request    JSON RPC request
-
-        # Returns:
-        # True if worker type is valid
-        # False with error response if workertype is invalid
-        # """
-
-        # if worker_type is not None:
-            # if isinstance(worker_type, WorkerType):
-                # json_rpc_request["params"]["workerType"] = worker_type.value
-            # elif isinstance(worker_type, int) and \
-                    # (worker_type in [w.value for w in WorkerType]):
-                # json_rpc_request["params"]["workerType"] = worker_type
-            # else:
-                # return False, create_error_response(
-                    # JRPCErrorCodes.INVALID_PARAMETER_FORMAT_OR_VALUE,
-                    # json_rpc_request["id"],
-                    # "WorkType should be an Integer of range 1-3")
-
-        # return True, ""
-
+        self.__uri_client = HttpJrpcClient(config["json_rpc_uri"])
+        self.validation = ArgumentValidator()
+    
+    @decorate
     def worker_retrieve(self, worker_id, id=None):
         """
         Retrieve the worker identified by worker ID.
@@ -81,10 +46,8 @@ class JRPCWorkerRegistryImpl(WorkerRegistry):
         organization ID, application ID, worker status,
         and worker details.
         """
-        
-        code = ArgumentValidator.not_null(id, worker_id)
-        if code:
-            return code
+
+        self.validation.not_null(id, worker_id)
 
         json_rpc_request = {
             "jsonrpc": "2.0",
@@ -94,9 +57,12 @@ class JRPCWorkerRegistryImpl(WorkerRegistry):
                 "workerId": worker_id
             }
         }
+        
+        json_validation(id,"WorkerRetrieve", json_rpc_request["params"])
         response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
         return response
-
+    
+    @decorate
     def worker_lookup(self, worker_type=None, organization_id=None,
                       application_type_id=None, id=None):
         """
@@ -125,6 +91,7 @@ class JRPCWorkerRegistryImpl(WorkerRegistry):
         JRPC response containing number of workers,
         lookup tag, and list of worker IDs.
         """
+
         json_rpc_request = {
             "jsonrpc": "2.0",
             "method": "WorkerLookUp",
@@ -133,27 +100,22 @@ class JRPCWorkerRegistryImpl(WorkerRegistry):
             }
         }
         
-        code = InputValidation.enum_value("WorkerType",w_type)
-        if not code : 
-            self.request["params"]["workerType"] = WorkerType(w_type)
-            return self.request
-        else :
-            return code
-        code, error_response = self.workerType_validation(
-                                    worker_type, json_rpc_request)
-        if not code:
-            return error_response
-
+        e_value = self.validation.enum_value(id, "WorkerType", worker_type)
+        json_rpc_request["params"]["workerType"] = e_value
+        
         if organization_id is not None:
             json_rpc_request["params"]["organizationId"] = organization_id
 
         if application_type_id is not None:
             json_rpc_request["params"]["applicationTypeId"] = \
                 application_type_id
+        
+        json_validation(id,"WorkerLookUp", json_rpc_request["params"])
 
         response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
         return response
-
+    
+    @decorate
     def worker_lookup_next(self, lookup_tag, worker_type=None,
                            organization_id=None, application_type_id=None,
                            id=None):
@@ -193,10 +155,8 @@ class JRPCWorkerRegistryImpl(WorkerRegistry):
             }
         }
 
-        code, error_response = self.workerType_validation(
-                                    worker_type, json_rpc_request)
-        if not code:
-            return error_response
+        e_value = self.validation.enum_value(id, "WorkerType",worker_type)
+        json_rpc_request["params"]["workerType"] = e_value
 
         if organization_id is not None:
             json_rpc_request["params"]["organizationId"] = organization_id
@@ -204,10 +164,12 @@ class JRPCWorkerRegistryImpl(WorkerRegistry):
         if application_type_id is not None:
             json_rpc_request["params"]["applicationTypeId"] = \
                 application_type_id
-
+        
+        json_validation(id,"WorkerLookUpNext", json_rpc_request["params"])
         response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
         return response
 
+    @decorate
     def worker_register(self, worker_id, worker_type, org_id,
                         application_type_ids, details, id=None):
         """
@@ -242,14 +204,13 @@ class JRPCWorkerRegistryImpl(WorkerRegistry):
             }
         }
 
-        code, error_response = self.workerType_validation(
-                                    worker_type, json_rpc_request)
-        if not code:
-            return error_response
-
+        e_value = self.validation.enum_value(id, "WorkerType",worker_type)
+        json_rpc_request["params"]["workerType"] = e_value
+        json_validation(id,"WorkerRegister", json_rpc_request["params"])
         response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
         return response
 
+    @decorate
     def worker_update(self, worker_id, details, id=None):
         """
         Update worker with new information.
@@ -272,9 +233,12 @@ class JRPCWorkerRegistryImpl(WorkerRegistry):
                 "details": details
             }
         }
+        
+        json_validation(id,"WorkerUpdate", json_rpc_request["params"])
         response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
         return response
 
+    @decorate
     def worker_set_status(self, worker_id, status, id=None):
         """
         Set the worker status to active, offline,
@@ -288,6 +252,9 @@ class JRPCWorkerRegistryImpl(WorkerRegistry):
         Returns:
         JRPC response with status.
         """
+        
+        self.validation.not_null(id, worker_id)
+
         json_rpc_request = {
             "jsonrpc": "2.0",
             "method": "WorkerSetStatus",
@@ -297,5 +264,30 @@ class JRPCWorkerRegistryImpl(WorkerRegistry):
                 "status": status.value
             }
         }
+        
+        json_validation(id,"WorkerSetStatus", json_rpc_request["params"])
         response = self.__uri_client._postmsg(json.dumps(json_rpc_request))
         return response
+     
+    @decorate
+    def worker_api_validation(self, id, api_name, json_rpc_request):
+        """
+        Check the json format of the final request
+        
+        Parameters:
+        api_name   Name of the api
+        json_rpc_request  Final request to be sent
+        
+        Returns:
+        True and empty string on success and
+        False and string with error message on failure.
+        """
+        
+        bool, e_value = self.validation.not_null( id, api_name, json_rpc_request)
+        if  not bool:
+            return  e_value
+
+        json_validation(id, "json_rpc", json_rpc_request)
+        json_validation(id, api_name, json_rpc_request["params"])
+        
+        return True

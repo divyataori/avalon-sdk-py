@@ -18,14 +18,23 @@ Decorator  function
 
 import functools
 from core.exceptions.invalid_parameter import InvalidParamException
+from core.exceptions.unknown_error import UnknownException
+from jsonschema import validate, ValidationError, SchemaError
+from core.exceptions.invalid_parameter_jrpc import InvalidParameterFormatOrValueException
 
 def decorate(f):
     @functools.wraps(f)
     def func(*args, **kwargs):
         try:
             return f(*args, **kwargs)
+
         except InvalidParamException as e:
-            return e.error_message()
+            return e.error
+        except InvalidParameterFormatOrValueException as e:
+            return e.error
         except Exception as e:
-            print('Caught an exception in', f.__name__)
+            msg = 'Caught an exception in '+ f.__name__
+            err = UnknownException(msg, e)
+            return err.error
     return func
+
