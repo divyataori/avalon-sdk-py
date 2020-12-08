@@ -12,4 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = []
+from enum import Enum, unique
+
+
+@unique
+class ContractResponse(Enum):
+    """Contract response values."""
+    SUCCESS = 0
+    ERROR = -1

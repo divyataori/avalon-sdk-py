@@ -12,4 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = []
+from enums.proxy.provider_response import ProviderResponse
+
+class ProxyProviderMissingOrInvalid(Exception):
+    """All errors and status are returned in 
+    the following generic JSON RPC error format"""
+
+    def __init__(self, message):
+
+        self.error = {
+            "code": ProviderResponse.ERROR,
+            "message": message   
+        }
+

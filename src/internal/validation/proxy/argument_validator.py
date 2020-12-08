@@ -18,6 +18,8 @@ Argument Validation Extension
 
 from validation.argument_validator import ArgumentValidator
 from exceptions.proxy.contract_error import ContractFailed
+from exceptions.proxy.provider_error import ProxyProviderMissingOrInvalid
+from urllib.parse import urlparse
 
 def not_valid_contract(self, **kwargs): 
     for key, value in kwargs.items():
@@ -27,6 +29,31 @@ def not_valid_contract(self, **kwargs):
     return True
 
 setattr(ArgumentValidator,'not_valid_contract', not_valid_contract)
+
+def valid_proxy_provider(self, **kwargs):
+    for key, value in kwargs.items():
+        if value is None:
+            message = key.replace("_"," ") + "is not available !!"
+            raise ProxyProviderMissingOrInvalid(message)
+        else:
+            if "scheme" and netloc not in urlparse(value):
+                message = key.replace("_"," ") + "is not a valid url"
+                raise ProxyProviderMissingOrInvalid(message)
+    return True
+
+setattr(ArgumentValidator,'valid_proxy_provider', valid_proxy_provider)
+
+
+def valid_hex_of_length(self, **kwargs, length, id=None):
+    for key, value in kwargs.items():
+        if not_valid_hex_of_length(value, length):
+            message = key.replace("_", " ") + "is either not a hex string or is of invalid length"
+            raise InvalidParamException(message, id)
+        else:
+            return
+
+setattr(ArgumentValidator,'valid_hex_of_length', valid_hex_of_length)
+
 
 
 

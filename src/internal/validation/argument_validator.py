@@ -25,8 +25,6 @@ class ArgumentValidator(object):
     Helper method for validating an argument that will be used by this API in any requests.
     """
 
-    
-    
     def __init__(self):
       self.enum_dic = {
           "WorkerType" : WorkerType
@@ -41,7 +39,6 @@ class ArgumentValidator(object):
             raise InvalidParamException(message, id)
 
         return r_value
-
 
     def not_null(self,id, *argv): 
         for arg in argv: 
@@ -58,6 +55,7 @@ class ArgumentValidator(object):
             message = "Invalid Filepath" 
             raise InvalidParamException(message, id)
         return 
+    
 
 
  
