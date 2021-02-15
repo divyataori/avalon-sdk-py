@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from abc import ABC, abstractmethod
-from avalon_sdk.connector.interfaces.work_order import WorkOrder
+from interfaces.work_order import WorkOrder
 
 
 class WorkOrderProxy(WorkOrder):

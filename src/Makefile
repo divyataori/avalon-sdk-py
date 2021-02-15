@@ -14,8 +14,8 @@
 
 
 all :
-	python3 setup.py sdist bdist_wheel ;
-	#python3 setup_ethereum.py sdist bdist_wheel ;
+	#python3 setup.py sdist bdist_wheel ;
+	python3 setup_ethereum.py sdist bdist_wheel ;
 
 clean:
 	rm -rf build deps dist *.egg-info

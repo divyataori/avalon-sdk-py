@@ -15,7 +15,7 @@
 import asyncio
 import logging
 from utility.hex_utils import is_valid_hex_str
-from avalon_sdk.connector.blockchains.ethereum.ethereum_wrapper \
+from avalon_sdk_ethereum.ethereum_wrapper \
     import get_keccak_for_text
 
 logging.basicConfig(

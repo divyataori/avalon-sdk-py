@@ -57,5 +57,5 @@ setup(name='avalon_sdk_ethereum',
                     'avalon_sdk_ethereum': ['ethereum_contracts/*.sol']},
       include_dirs = include_dirs,
       include_package_data=True,
-      install_requires=[],
+      install_requires=['jsonschema'],
       entry_points={})

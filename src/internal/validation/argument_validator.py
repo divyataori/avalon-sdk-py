@@ -24,12 +24,25 @@ class ArgumentValidator(object):
     """
     Helper method for validating an argument that will be used by this API in any requests.
     """
+    __instance = None
+
+    @staticmethod 
+    def getInstance():
+        """ Static access method. """
+        if ArgumentValidator.__instance == None:
+            ArgumentValidator()
+        return ArgumentValidator.__instance
 
     def __init__(self):
-      self.enum_dic = {
-          "WorkerType" : WorkerType
-      }
-
+        """ Virtually private constructor. """
+        self.enum_dic = {
+            "WorkerType" : WorkerType,
+            "WorkerStatus" : WorkerStatus
+                        }
+        if ArgumentValidator.__instance != None:
+            raise Exception("This class is a singleton!")
+        else:
+            ArgumentValidator.__instance = self
 
     def enum_value(self,id, enum, value):
         enum_obj = self.enum_dic[enum]

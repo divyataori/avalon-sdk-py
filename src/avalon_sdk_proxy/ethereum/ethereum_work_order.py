@@ -30,6 +30,7 @@ import validation.proxy.argument_validator
 from validation.argument_validator import ArgumentValidator
 from validation.json_validator import JsonValidator
 from handler.error_handler import error_handler
+from utility.hex_utils import is_valid_hex_of_length
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
@@ -75,8 +76,7 @@ class EthereumWorkOrderProxyImpl(WorkOrderProxy):
         self.__eth_client = EthereumWrapper(config)
         self._config = config
 
-        contract_file_name =
-            config.get("work_order_contract_file")
+        contract_file_name = config.get("work_order_contract_file")
         contract_address = \
             config.get("work_order_contract_address")
         logging.info("Contract_file_name {}".format(contract_file_name))
@@ -114,10 +114,10 @@ class EthereumWorkOrderProxyImpl(WorkOrderProxy):
         JsonValidator.json_validation(id, "WorkOrderSubmit", work_order_request_json)
         self.validation.valid_hex_of_length(
             id,
+            64,
             work_order_id = work_order_request_json["workOrderId"],
             worker_id = work_order_request_json["workerId"],
-            requester_id = work_order_request_json["requesterId"],
-            64
+            requester_id = work_order_request_json["requesterId"]
         )
         contract_func = \
             self.__contract_instance.functions.workOrderSubmit(
@@ -146,8 +146,9 @@ class EthereumWorkOrderProxyImpl(WorkOrderProxy):
             work_order_contract_instance = self.__contract_instance
         )
         self.validation.valid_hex_of_length(
+            None,
+            64,
             work_order_id = work_order_id
-            64
         )
         try:
             contract_func = \
@@ -189,9 +190,9 @@ class EthereumWorkOrderProxyImpl(WorkOrderProxy):
             work_order_contract_instance = self.__contract_instance
         )
         self.validation.valid_hex_of_length(
-            work_order_id = work_order_id
+            id,
             64,
-            id
+            work_order_id = work_order_id
         )
         # workOrderGet returns tuple containing work order
         # result params as defined in EEA spec 6.10.5
@@ -278,7 +279,7 @@ class EthereumWorkOrderProxyImpl(WorkOrderProxy):
         pass
 
 
-def __is_wo_id_in_event(event, *kargs, **kwargs):
+def is_wo_id_in_event(event, *kargs, **kwargs):
     """
     This function checks if a specific work order id(passed
     in via kwargs) is there in the event as well. So, it is

@@ -41,7 +41,7 @@ class TestJRPCWorkOrderImpl(unittest.TestCase):
             "resultUri": "http://result-uri:8080",
             "notifyUri": "http://notify-uri:8080",
             "workOrderId": self.__work_order_id,
-            "workerId": "0",
+            "workerId": "",
             "workloadId": "heart-disease-eval".encode("utf-8").hex(),
             "requesterId": secrets.token_hex(32),
             "workerEncryptionKey": secrets.token_hex(32),
